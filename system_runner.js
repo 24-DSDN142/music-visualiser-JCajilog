@@ -1,5 +1,5 @@
-const canvasWidth = 540;
-const canvasHeight = 960;
+const canvasWidth = 1280; //HD (High Definition) 720p 16:9  
+const canvasHeight = 720;
 
 
 let mainCanvas;
