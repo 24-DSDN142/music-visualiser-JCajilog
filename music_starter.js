@@ -6,18 +6,29 @@ let raining = [];
 let rainTilt = 2
 let grains = []
 let stockCount = []
+let balloon;
+let balloonPosx;
+let balloonPosY;
 
 
 function draw_one_frame(words, vocal, drum, bass, other, counter) {
+
+  translate (0, -10* sin (counter)) //camera shake
+  rotate (0)
+  rotate (0.2*sin(counter))
+  angleMode (DEGREES)
+
   let From = color(61,52,69);
   let To = color(83,67,97);
   let Heartbeat = lerpColor(From, To, map(other, 70, 80, 0, 1))
   background(Heartbeat) //IMPORTANT BECAUSE RESET FRAME TO DRAW NEXT
+
   textFont('Courier New'); // please use CSS safe fonts
   textStyle(BOLD)
   textSize(24);
   rectMode(CENTER)
-  lineVisual = vocal
+
+  lineVisual = drum
   LVisMax = 100 //max for line
 
   //Grain
@@ -76,28 +87,34 @@ function draw_one_frame(words, vocal, drum, bass, other, counter) {
 
      push();
      drawingContext.setLineDash ([0])
-     strokeWeight (map(other, 60, 90, 10, 20))
+     strokeWeight (map(other, 30, 90, 2, 20))
      stroke (200, 20)
      point (x,y)
      pop();
 
-      vertex (x, y);
+    vertex (x, y);
 
      
   }
     endShape();
-    // // point (map(counter, 0, ending, 1190, 100)-80 + (100*sin(counter)), (height/2)+50+ (150*sin(counter*5))-20) //THIS MODELS THE CONTROL POINT WHICH ALLOWS THE TRAIL TO MOVE
-    // strokeWeight(10);
-    // beginShape(); //Line connecting rect() to trail. MIGHT GET RID OF
-    // curveVertex (map(counter, 0, ending, 1190, 100)-80 + (100*sin(counter)), (height/2)+50 + (150*sin(counter*5))-20)
-    // curveVertex (map(counter, 0, ending, 1190, 100)-40, (height/2)+50)
-    // curveVertex (map(counter, 0, ending, 1190, 110), (height/2)+50-map(lineVisual, 0, 100, 0, LVisMax))
-    // curveVertex (map(counter, 0, ending, 1190, 110), (height/2)+50-map(lineVisual, 0, 100, 0, LVisMax))
-    // endShape();
+    
+   // point (map(counter, 0, ending, 1190, 100)-80 + (100*sin(counter)), (height/2)+50+ (150*sin(counter*5))-20) //THIS MODELS THE CONTROL POINT WHICH ALLOWS THE TRAIL TO MOVE
+    strokeWeight(4);
+    beginShape(); //Line connecting rect() to trail
+    curveVertex (map(counter, 0, ending, 1190, 100)-80 + (100*sin(counter)), (height/2)+50 + (150*sin(counter*5))-20)
+    curveVertex (map(counter, 0, ending, 1190, 100)-40, (height/2)+50)
+    curveVertex (map(counter, 0, ending, 1190, 90), (height/2)+50-map(lineVisual, 0, 100, 0, LVisMax))
+    curveVertex (map(counter, 0, ending, 1190, 90), (height/2)+50-map(lineVisual, 0, 100, 0, LVisMax))
+    endShape();
   pop();
   } else {
     lineHistory = [];  //reset the array when starting song again. 
   }
+
+  push(); //BALLOON
+  balloon = new Balloon (map(counter, 0, ending, 1190, 90)-1, (height/2)+10-map(lineVisual, 0, 100, 0, LVisMax))
+  balloon.show(bass);
+  pop()
 
   //CinematicBars + FilmStock + Refence text
  push();
@@ -107,10 +124,10 @@ function draw_one_frame(words, vocal, drum, bass, other, counter) {
   if (counter <720){ //For the fade in at the start
     cinemaBar = map (counter, 0, 720, 500, 70)
   } else {
-    cinemaBar = 70
+    cinemaBar = 80
   }
- rect (0,0, 1280, cinemaBar+random(5, 10)) //the actual cinema bars
- rect (0,710-cinemaBar+random(5, 10), 1280, cinemaBar)
+ rect (0,-10, 1280, cinemaBar+random(5, 10)) //the actual cinema bars
+ rect (0,720-cinemaBar+random(5, 10), 1280, cinemaBar)
 
  push(); //white squares
  strokeJoin(ROUND)
@@ -121,14 +138,14 @@ function draw_one_frame(words, vocal, drum, bass, other, counter) {
  }
  for (x=12 ; x < width; x += 300 ){
   for (y = 15; y < height; y+= 647){ 
- rect (x + random(2, 5), y + random(-2, -5), 50, 50)
+ rect (x + random(2, 7), y + random(-2, -5), 50, 50)
     }
    }
  pop();
 
  if(counter >720){ //framecounter visual
  push();
- fill (255,random(5, 30)) 
+ fill (255,random(0, 15)) 
  textAlign (CENTER)
  textStyle(BOLD)
  textSize (60);
@@ -138,7 +155,7 @@ function draw_one_frame(words, vocal, drum, bass, other, counter) {
  if (stockCount.length > 4){
   stockCount.splice (0,1)
  }
- text (stockCount[0], x + random(2, 4), y + random(2, 4))
+ text (stockCount[0], x + random(2, 7), y + random(2, 4))
   }
  }
  pop();
@@ -147,11 +164,15 @@ function draw_one_frame(words, vocal, drum, bass, other, counter) {
  fill (255,0,0) 
  text ("1280x720", 10, 30)  //reference text //REMOVE LATER ON!!
  text (counter, 10, 60)
+ push();
+ translate(0,0)
  text (mouseX, 10, 90)
  text (mouseY, 10, 120)
- pop();
+  pop();
 
-}
+
+
+}  //end of DRAW FUNCTION
 
 //RAIN 
 class Rain {
@@ -166,9 +187,8 @@ class Rain {
     line (this.x, this.y, this.x, this.y + this.length)
   }
   fall(bass){
-    // this.Falling = Falling + random(20, 60)
     this.y += map(bass, 0, 100, 4, 12)
-    this.x += rainTilt
+    this.x += rainTilt + map (bass, 0, 100, 0, 2)
     if  (raining.length> map(bass, 0, 100, 247, 297)){
       raining.splice(0,1);
     }
@@ -192,5 +212,34 @@ class Grains {
     }
   }
   }
+
+  //BALLOON
+class Balloon {
+  constructor (x,y){
+    this.x = x 
+    this.y = y
+  }
+  show(bass){
+
+    stroke(0,10);
+    fill (235,150,121)
+
+ beginShape();
+ vertex (this.x,this.y+25)
+ vertex (this.x-9,this.y+40)
+ vertex (this.x+5,this.y+45)
+ endShape();
+  
+ push();
+ translate (this.x+5, this.y+10)
+ rotate (0)
+ rotate (map(bass, 0, 100, 5, 15))
+  ellipse(random (0, 2), 0,45,55)
+ pop();
+  }
+
+
+
+}
 
 
