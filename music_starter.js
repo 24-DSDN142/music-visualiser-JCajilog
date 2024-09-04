@@ -9,9 +9,22 @@ let stockCount = []
 let balloon;
 let balloonPosx;
 let balloonPosY;
+let firstRun = true
+
+let character1 = []; //work in progress
+
+let img;
 
 
 function draw_one_frame(words, vocal, drum, bass, other, counter) {
+
+  //images loading
+  if (firstRun) {
+    rectMode(CENTER);
+    //character1.push(loadImage('Title_Screen.png'));
+    img = loadImage ('Title_Screen.png')
+    firstRun = false
+  }
 
   translate (0, -10* sin (counter)) //camera shake
   rotate (0)
@@ -70,7 +83,7 @@ function draw_one_frame(words, vocal, drum, bass, other, counter) {
     drawingContext.setLineDash([3]);
     strokeJoin(ROUND)
     noFill()
-    stroke(200, map(counter, 0, 1000, 0, 255))
+    stroke(200, map(counter, 0, 1000, 0, 200))
    strokeWeight(4)
    lineHistory.push(lineVisual); //to change what the line models
    
@@ -91,7 +104,7 @@ function draw_one_frame(words, vocal, drum, bass, other, counter) {
      stroke (200, 20)
      point (x,y)
      pop();
-
+    
     vertex (x, y);
 
      
@@ -99,13 +112,16 @@ function draw_one_frame(words, vocal, drum, bass, other, counter) {
     endShape();
     
    // point (map(counter, 0, ending, 1190, 100)-80 + (100*sin(counter)), (height/2)+50+ (150*sin(counter*5))-20) //THIS MODELS THE CONTROL POINT WHICH ALLOWS THE TRAIL TO MOVE
-    strokeWeight(4);
+    push();
+   strokeWeight(4);
+   drawingContext.setLineDash([0]);
     beginShape(); //Line connecting rect() to trail
     curveVertex (map(counter, 0, ending, 1190, 100)-80 + (100*sin(counter)), (height/2)+50 + (150*sin(counter*5))-20)
     curveVertex (map(counter, 0, ending, 1190, 100)-40, (height/2)+50)
     curveVertex (map(counter, 0, ending, 1190, 90), (height/2)+50-map(lineVisual, 0, 100, 0, LVisMax))
     curveVertex (map(counter, 0, ending, 1190, 90), (height/2)+50-map(lineVisual, 0, 100, 0, LVisMax))
     endShape();
+    pop();
   pop();
   } else {
     lineHistory = [];  //reset the array when starting song again. 
@@ -129,6 +145,28 @@ function draw_one_frame(words, vocal, drum, bass, other, counter) {
  rect (0,-10, 1280, cinemaBar+random(5, 10)) //the actual cinema bars
  rect (0,720-cinemaBar+random(5, 10), 1280, cinemaBar)
 
+ push();//OPENING TITLE
+ textFont('Monaco')
+ textStyle (NORMAL)
+ textAlign(CENTER)
+ rectMode(CENTER)
+
+ textSize(120)
+ fill (255)
+  if (counter>200){
+    fill(255, map(counter, 200, 450, 255, 0))
+ text ("V   I   O   L   E   T", width/2, (height/2) -30 - (map(counter, 200, 720, 0, 360)))
+    textSize(40);
+    fill(200)
+ text ("Ninomae Ina'nis", width/2, (height/2)+30 +  map(counter, 200, 720, 0, 360))
+    } else {
+      text ("V   I   O   L   E   T", width/2, (height/2) -30)
+    textSize(40);
+    fill(200)
+    text ("Ninomae Ina'nis", width/2, (height/2)+30)
+    }
+ pop();
+
  push(); //white squares
  strokeJoin(ROUND)
  strokeWeight (random(4, 8))
@@ -138,14 +176,16 @@ function draw_one_frame(words, vocal, drum, bass, other, counter) {
  }
  for (x=12 ; x < width; x += 300 ){
   for (y = 15; y < height; y+= 647){ 
- rect (x + random(2, 7), y + random(-2, -5), 50, 50)
+ rect (x + random(2, 7), y + random(-2, -5), 45, 50)
     }
    }
  pop();
 
  if(counter >720){ //framecounter visual
  push();
- fill (255,random(0, 15)) 
+ rectMode(CORNER)
+ textAlign(LEFT)
+ fill (255,random(10, 25)) 
  textAlign (CENTER)
  textStyle(BOLD)
  textSize (60);
@@ -161,16 +201,18 @@ function draw_one_frame(words, vocal, drum, bass, other, counter) {
  pop();
 }
 
+push();
+  rectMode(CORNER)
+  textAlign(LEFT)
  fill (255,0,0) 
  text ("1280x720", 10, 30)  //reference text //REMOVE LATER ON!!
  text (counter, 10, 60)
- push();
  translate(0,0)
  text (mouseX, 10, 90)
  text (mouseY, 10, 120)
   pop();
 
-
+  //image (img, 0,100) //placing image
 
 }  //end of DRAW FUNCTION
 
@@ -225,9 +267,12 @@ class Balloon {
     fill (235,150,121)
 
  beginShape();
+ push();
+ translate (2,0);
  vertex (this.x,this.y+25)
  vertex (this.x-9,this.y+40)
  vertex (this.x+5,this.y+45)
+ pop();
  endShape();
   
  push();
