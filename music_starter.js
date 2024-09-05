@@ -12,21 +12,32 @@ let balloonPosY;
 let firstRun = true
 
 let character1 = []; //work in progress
+let characterFrame;
 
-let img;
+let bgCharacter;
 
+let bg;
+
+let finalImg;
 
 function draw_one_frame(words, vocal, drum, bass, other, counter) {
 
   //images loading
   if (firstRun) {
     rectMode(CENTER);
-    //character1.push(loadImage('Title_Screen.png'));
-    img = loadImage ('Title_Screen.png')
+    character1.push(loadImage('takodachi.png'));
+    character1.push(loadImage('takodachi1.png'));
+    character1.push(loadImage('takodachi3.png'));
+    character1.push(loadImage('takodachi2.png'));
+
+    bgCharacter = loadImage('singing_character.png');
+    bg = loadImage ('bgtest.png')
+    finalImg = loadImage ('Title_Screen.png')
+
     firstRun = false
   }
 
-  translate (0, -10* sin (counter)) //camera shake
+  translate (0, -10* sin (counter)) //Camera shake
   rotate (0)
   rotate (0.2*sin(counter))
   angleMode (DEGREES)
@@ -34,7 +45,7 @@ function draw_one_frame(words, vocal, drum, bass, other, counter) {
   let From = color(61,52,69);
   let To = color(83,67,97);
   let Heartbeat = lerpColor(From, To, map(other, 70, 80, 0, 1))
-  background(Heartbeat) //IMPORTANT BECAUSE RESET FRAME TO DRAW NEXT
+  background(Heartbeat) //IMPORTANT BECAUSE RESET FRAME TO DRAW NEXT //This will change to a drawn background where I will use tint();
 
   textFont('Courier New'); // please use CSS safe fonts
   textStyle(BOLD)
@@ -42,7 +53,14 @@ function draw_one_frame(words, vocal, drum, bass, other, counter) {
   rectMode(CENTER)
 
   lineVisual = drum
-  LVisMax = 100 //max for line
+  LVisMax = 200 //max for line
+
+  
+  push();
+  imageMode(CORNER);
+  image(bg, 0, 0);
+  pop();
+
 
   //Grain
   if (counter>0){
@@ -69,12 +87,31 @@ function draw_one_frame(words, vocal, drum, bass, other, counter) {
   }
   pop();
 } 
+push(); //background singing char.
+imageMode(CENTER)
+colorMode (HSB)
+blendMode (SCREEN)
+tint (map(counter, 0, ending, 150, 10))
+translate (map(counter, 0, ending, 0, 640), 10*sin(counter))
+image (bgCharacter, 320,370)
+
+stroke(map(counter, 0, 1500, 10, 150))
+fill(20)
+beginShape();
+stroke(map(counter, 0, ending, 200, 10))
+curveVertex (368, map(vocal, 10, 90, 152, 242))
+curveVertex (354, 152)
+
+curveVertex (315, 153)
+curveVertex (329, map(vocal, 10, 90, 153, 243))
+endShape();
+pop();
+
 
   //CHARACTER
-  push();  
-  stroke (200, map(counter, 0, 1500, 0,255))
-  fill (255, map(counter, 0, 1500, 0, 255))  //fade in from start
-  rect(map(counter, 0, ending, 1190, 100)-50, height/2, 20, 100)
+  push();
+  characterFrame = int(counter / 50) % 4
+  image (character1[characterFrame], map(counter, 0, ending, 1190, 100)-220, 300)
   pop();
 
   //LINE
@@ -83,7 +120,7 @@ function draw_one_frame(words, vocal, drum, bass, other, counter) {
     drawingContext.setLineDash([3]);
     strokeJoin(ROUND)
     noFill()
-    stroke(200, map(counter, 0, 1000, 0, 200))
+    stroke(200,100)
    strokeWeight(4)
    lineHistory.push(lineVisual); //to change what the line models
    
@@ -99,25 +136,24 @@ function draw_one_frame(words, vocal, drum, bass, other, counter) {
      let y =(height/2)+50-map(lineHistory[i], 0, 100, 0, LVisMax);
 
      push();
-     drawingContext.setLineDash ([0])
+     drawingContext.setLineDash ([2])
      strokeWeight (map(other, 30, 90, 2, 20))
      stroke (200, 20)
      point (x,y)
      pop();
     
     vertex (x, y);
-
      
   }
     endShape();
     
-   // point (map(counter, 0, ending, 1190, 100)-80 + (100*sin(counter)), (height/2)+50+ (150*sin(counter*5))-20) //THIS MODELS THE CONTROL POINT WHICH ALLOWS THE TRAIL TO MOVE
     push();
    strokeWeight(4);
+   stroke (255,200)
    drawingContext.setLineDash([0]);
     beginShape(); //Line connecting rect() to trail
-    curveVertex (map(counter, 0, ending, 1190, 100)-80 + (100*sin(counter)), (height/2)+50 + (150*sin(counter*5))-20)
-    curveVertex (map(counter, 0, ending, 1190, 100)-40, (height/2)+50)
+    curveVertex (map(counter, 0, ending, 1190, 100)-120 + (100*sin(counter)), (height/2)+50 + (150*sin(counter*5))+42)
+    curveVertex (map(counter, 0, ending, 1190, 100)-80, (height/2)+112)
     curveVertex (map(counter, 0, ending, 1190, 90), (height/2)+50-map(lineVisual, 0, 100, 0, LVisMax))
     curveVertex (map(counter, 0, ending, 1190, 90), (height/2)+50-map(lineVisual, 0, 100, 0, LVisMax))
     endShape();
@@ -132,6 +168,7 @@ function draw_one_frame(words, vocal, drum, bass, other, counter) {
   balloon.show(bass);
   pop()
 
+
   //CinematicBars + FilmStock + Refence text
  push();
  rectMode(CORNER);
@@ -139,6 +176,7 @@ function draw_one_frame(words, vocal, drum, bass, other, counter) {
  fill(20) 
   if (counter <720){ //For the fade in at the start
     cinemaBar = map (counter, 0, 720, 500, 70)
+
   } else {
     cinemaBar = 80
   }
@@ -155,15 +193,15 @@ function draw_one_frame(words, vocal, drum, bass, other, counter) {
  fill (255)
   if (counter>200){
     fill(255, map(counter, 200, 450, 255, 0))
- text ("V   I   O   L   E   T", width/2, (height/2) -30 - (map(counter, 200, 720, 0, 360)))
+ text ("V   I   O   L   E   T", width/2, (height/2) -40 - (map(counter, 200, 720, 0, 360)))
     textSize(40);
-    fill(200)
- text ("Ninomae Ina'nis", width/2, (height/2)+30 +  map(counter, 200, 720, 0, 360))
+    fill(200, map(counter, 200, 450, 255, 0))
+ text ("Ninomae Ina'nis", width/2, (height/2)+40 +  map(counter, 200, 720, 0, 360))
     } else {
-      text ("V   I   O   L   E   T", width/2, (height/2) -30)
+      text ("V   I   O   L   E   T", width/2, (height/2) -40)
     textSize(40);
     fill(200)
-    text ("Ninomae Ina'nis", width/2, (height/2)+30)
+    text ("Ninomae Ina'nis", width/2, (height/2)+40)
     }
  pop();
 
@@ -183,13 +221,13 @@ function draw_one_frame(words, vocal, drum, bass, other, counter) {
 
  if(counter >720){ //framecounter visual
  push();
- rectMode(CORNER)
- textAlign(LEFT)
+ rectMode(CENTER)
+ textAlign(CENTER)
  fill (255,random(10, 25))
  textStyle(BOLD)
  textSize (60);
- for (x=1090; x > 0; x-= 300){
-  for (y=55; y<720; y += 645){
+ for (x=1080; x > 0; x-= 300){
+  for (y=40; y<720; y += 645){
   stockCount.push(counter)
  if (stockCount.length > 4){
   stockCount.splice (0,1)
@@ -200,20 +238,36 @@ function draw_one_frame(words, vocal, drum, bass, other, counter) {
  pop();
 }
 
-push();
-  rectMode(CORNER)
-  textAlign(LEFT)
- fill (255,0,0) 
- text ("1280x720", 10, 30)  //reference text //REMOVE LATER ON!!
- text (counter, 10, 60)
- translate(0,0)
- text (mouseX, 10, 90)
- text (mouseY, 10, 120)
-  pop();
+  if (counter>12000){
+    background (0)
+    image (finalImg, 0, 85, 1280, 550)
+  }
 
-  //image (img, 0,100) //placing image
+
+
+
+// push();
+//   rectMode(CORNER)
+//   textAlign(LEFT)
+//  fill (255,0,0) 
+//  text ("1280x720", 10, 30)  //reference text //REMOVE LATER ON!!
+//  text (counter, 10, 60)
+//  translate(0,0)
+//  text (mouseX, 10, 90)
+//  text (mouseY, 10, 120)
+//   pop();
+  
+  //TESTING Place
 
 }  //end of DRAW FUNCTION
+
+
+
+
+
+
+
+
 
 //RAIN 
 class Rain {
@@ -281,9 +335,5 @@ class Balloon {
   ellipse(random (0, 2), 0,45,55)
  pop();
   }
-
-
-
 }
-
 
