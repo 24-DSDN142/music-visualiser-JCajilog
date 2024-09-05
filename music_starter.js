@@ -185,8 +185,7 @@ function draw_one_frame(words, vocal, drum, bass, other, counter) {
  push();
  rectMode(CORNER)
  textAlign(LEFT)
- fill (255,random(10, 25)) 
- textAlign (CENTER)
+ fill (255,random(10, 25))
  textStyle(BOLD)
  textSize (60);
  for (x=1090; x > 0; x-= 300){
