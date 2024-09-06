@@ -7,16 +7,15 @@ let rainTilt = 2
 let grains = []
 let stockCount = []
 let balloon;
-let balloonPosx;
-let balloonPosY;
 let firstRun = true
 
-let character1 = []; //work in progress
+let character1 = []; 
 let characterFrame;
 
 let bgCharacter;
 
-let bg;
+let bg = []
+let bgFrame;
 
 let finalImg;
 
@@ -31,7 +30,8 @@ function draw_one_frame(words, vocal, drum, bass, other, counter) {
     character1.push(loadImage('takodachi2.png'));
 
     bgCharacter = loadImage('singing_character.png');
-    bg = loadImage ('bgtest.png')
+    bg.push(loadImage ('bgtest.png'));
+    bg.push(loadImage ('bgtest1.png'))
     finalImg = loadImage ('Title_Screen.png')
 
     firstRun = false
@@ -47,20 +47,19 @@ function draw_one_frame(words, vocal, drum, bass, other, counter) {
   let Heartbeat = lerpColor(From, To, map(other, 70, 80, 0, 1))
   background(Heartbeat) //IMPORTANT BECAUSE RESET FRAME TO DRAW NEXT //This will change to a drawn background where I will use tint();
 
-  textFont('Courier New'); // please use CSS safe fonts
+  textFont('Courier New'); // CSS safe fonts. I looked em' up 
   textStyle(BOLD)
   textSize(24);
   rectMode(CENTER)
 
-  lineVisual = drum
-  LVisMax = 200 //max for line
-
-  
+  //BACKGROUND
   push();
   imageMode(CORNER);
-  image(bg, 0, 0);
+  colorMode (HSB);
+  tint (0,0,(map(other, 0, 100, 40, 100)))
+  bgFrame = int(counter / 100) % 2
+  image(bg[bgFrame], 0, 0);
   pop();
-
 
   //Grain
   if (counter>0){
@@ -74,6 +73,7 @@ function draw_one_frame(words, vocal, drum, bass, other, counter) {
     grains.push(new Grains(random(width), 0))
   }
 }
+
   //RAIN
   if (counter>0){
   push();
@@ -87,11 +87,12 @@ function draw_one_frame(words, vocal, drum, bass, other, counter) {
   }
   pop();
 } 
+
 push(); //background singing char.
 imageMode(CENTER)
 colorMode (HSB)
 blendMode (SCREEN)
-tint (map(counter, 0, ending, 150, 10))
+tint (map(counter, 0, ending, 60, 20))
 translate (map(counter, 0, ending, 0, 640), 10*sin(counter))
 image (bgCharacter, 320,370)
 
@@ -110,17 +111,20 @@ pop();
 
   //CHARACTER
   push();
-  characterFrame = int(counter / 50) % 4
+  characterFrame = int(counter / 40) % 4
   image (character1[characterFrame], map(counter, 0, ending, 1190, 100)-220, 300)
   pop();
 
   //LINE
+  lineVisual = drum
+  LVisMax = 200 //max for line
+
   if (counter > 0) { //so line doesn't move while not starting song
   push();
     drawingContext.setLineDash([3]);
     strokeJoin(ROUND)
     noFill()
-    stroke(200,100)
+    stroke(200,150)
    strokeWeight(4)
    lineHistory.push(lineVisual); //to change what the line models
    
@@ -209,8 +213,8 @@ pop();
  strokeJoin(ROUND)
  strokeWeight (random(4, 8))
  if (counter > 720){
-  stroke (150 + random (-10, 10), 255)
- fill(150 + random (-10, 10), 255)
+  stroke (100 + random (-10, 10), 255)
+ fill(100 + random (-10, 10), 255)
  }
  for (x=12 ; x < width; x += 300 ){
   for (y = 15; y < height; y+= 647){ 
@@ -228,7 +232,7 @@ pop();
  textSize (60);
  for (x=1080; x > 0; x-= 300){
   for (y=40; y<720; y += 645){
-  stockCount.push(counter)
+  stockCount.push(int(counter/10)) //so that the frame count isn't absurdly high
  if (stockCount.length > 4){
   stockCount.splice (0,1)
  }
@@ -238,35 +242,27 @@ pop();
  pop();
 }
 
-  if (counter>12000){
+  if (counter>11780){
     background (0)
     image (finalImg, 0, 85, 1280, 550)
+    fill(255)
+    rectMode(CENTER)
+    textAlign(CENTER)
+    text ("DSDN142: Music Visualiser by Justin.C", width/2,700)
   }
 
-
-
-
-// push();
+// push(); //REFERENCES FOR PLACEMENTS AND TIMING
 //   rectMode(CORNER)
 //   textAlign(LEFT)
 //  fill (255,0,0) 
-//  text ("1280x720", 10, 30)  //reference text //REMOVE LATER ON!!
+//  text ("1280x720", 10, 30)
 //  text (counter, 10, 60)
 //  translate(0,0)
 //  text (mouseX, 10, 90)
 //  text (mouseY, 10, 120)
 //   pop();
   
-  //TESTING Place
-
 }  //end of DRAW FUNCTION
-
-
-
-
-
-
-
 
 
 //RAIN 
@@ -284,7 +280,7 @@ class Rain {
   fall(bass){
     this.y += map(bass, 0, 100, 4, 12)
     this.x += rainTilt + map (bass, 0, 100, 0, 2)
-    if  (raining.length> map(bass, 0, 100, 247, 297)){
+    if  (raining.length> map(bass, 0, 100, 247, 297)){ //mapping this allows for more rain depending on the bass
       raining.splice(0,1);
     }
   }
@@ -315,9 +311,9 @@ class Balloon {
     this.y = y
   }
   show(bass){
-
-    stroke(0,10);
-    fill (235,150,121)
+    stroke(230,255);
+    strokeWeight(1)
+    fill (255,150,121)
 
  beginShape();
  push();
@@ -325,15 +321,20 @@ class Balloon {
  vertex (this.x,this.y+25)
  vertex (this.x-9,this.y+40)
  vertex (this.x+5,this.y+45)
+ vertex (this.x,this.y+25)
  pop();
  endShape();
   
  push();
- translate (this.x+5, this.y+10)
+ translate (this.x+5, this.y-7)
  rotate (0)
  rotate (map(bass, 0, 100, 5, 15))
-  ellipse(random (0, 2), 0,45,55)
+  ellipse(random (0, 2), 0,65,75)
+  fill(255)
+  rotate(30)
+  ellipse(-23,-12,5,20)
  pop();
   }
 }
+
 
