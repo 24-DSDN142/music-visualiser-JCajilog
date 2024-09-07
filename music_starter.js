@@ -6,6 +6,7 @@ let raining = [];
 let rainTilt = 2
 let grains = []
 let stockCount = []
+let frameDiff;
 let balloon;
 let firstRun = true
 
@@ -17,7 +18,7 @@ let bgCharacter;
 let bg = []
 let bgFrame;
 
-let finalImg;
+let speed = 1
 
 function draw_one_frame(words, vocal, drum, bass, other, counter) {
 
@@ -32,7 +33,6 @@ function draw_one_frame(words, vocal, drum, bass, other, counter) {
     bgCharacter = loadImage('singing_character.png');
     bg.push(loadImage ('bgtest.png'));
     bg.push(loadImage ('bgtest1.png'))
-    finalImg = loadImage ('Title_Screen.png')
 
     firstRun = false
   }
@@ -41,11 +41,6 @@ function draw_one_frame(words, vocal, drum, bass, other, counter) {
   rotate (0)
   rotate (0.2*sin(counter))
   angleMode (DEGREES)
-
-  let From = color(61,52,69);
-  let To = color(83,67,97);
-  let Heartbeat = lerpColor(From, To, map(other, 70, 80, 0, 1))
-  background(Heartbeat) //IMPORTANT BECAUSE RESET FRAME TO DRAW NEXT //This will change to a drawn background where I will use tint();
 
   textFont('Courier New'); // CSS safe fonts. I looked em' up 
   textStyle(BOLD)
@@ -57,36 +52,32 @@ function draw_one_frame(words, vocal, drum, bass, other, counter) {
   imageMode(CORNER);
   colorMode (HSB);
   tint (0,0,(map(other, 0, 100, 40, 100)))
-  bgFrame = int(counter / 100) % 2
+  bgFrame = int(counter / 75) % 2
   image(bg[bgFrame], 0, 0);
   pop();
 
-  //Grain
-  if (counter>0){
+  //barricade code
+  push();  
+rectMode(CORNER)
+translate (-30,0)  //so that the bar doesn't just appear on the screen
+  for (x=0; x<width+30; x+=262){ // x += 1310/5 (dividing by 5 means visually five barricades)
+    fill(13,13,14)
+    strokeWeight(0)
+    rect(x + speed, 360, 30, 165)
+    
+    fill(146,125,104);
     push();
-    for (let g of grains){
-      g.show();
-    }
+    colorMode(HSL)
+    fill(30,17,map(drum, 0, 100, 35, 75))
+    rect(x + speed, 350, 30, 10, 4, 4, 0, 0)
     pop();
-  
-  for (let i=0; i<2; i++){
-    grains.push(new Grains(random(width), 0))
-  }
-}
 
-  //RAIN
-  if (counter>0){
-  push();
-  for (let r of raining){ //this helps to target the individual values in the array
-    r.show(bass)
-    r.fall(bass)
+    speed += 0.1
+    if (x+speed > width+30){
+      speed = 0
+    }
   }
-
-  for (let i=0; i<(map(bass, 0, 100, 1, 3)); i++){ //the mapping maps the amount of rain that gets made per count
-    raining.push(new Rain(random(width), 0))
-  }
-  pop();
-} 
+pop();
 
 push(); //background singing char.
 imageMode(CENTER)
@@ -108,12 +99,36 @@ curveVertex (329, map(vocal, 10, 90, 153, 243))
 endShape();
 pop();
 
-
   //CHARACTER
   push();
   characterFrame = int(counter / 40) % 4
-  image (character1[characterFrame], map(counter, 0, ending, 1190, 100)-220, 300)
+  image (character1[characterFrame], map(counter, 0, ending, 1190, 250)-220, 300)
   pop();
+
+  //Grain
+  if (counter>0){
+    push();
+    for (let g of grains){
+      g.show();
+    }
+    pop();
+  for (let i=0; i<2; i++){
+    grains.push(new Grains(random(width), 0))
+  }
+}
+
+  //RAIN
+  if (counter>0){
+  push();
+  for (let r of raining){ //this helps to target the individual values in the array
+    r.show(bass)
+    r.fall(bass)
+  }
+  for (let i=0; i<(map(bass, 0, 100, 1, 3)); i++){ //the mapping maps the amount of rain that gets made per count
+    raining.push(new Rain(random(width), 0))
+  }
+  pop();
+} 
 
   //LINE
   lineVisual = drum
@@ -130,13 +145,11 @@ pop();
    
     beginShape();
    for (let i=0; i<lineHistory.length; i++){
-
     if (lineHistory.length >= linesegment) { //for the line to cut
       lineHistory.splice(0, 1);
       linesegment = linesegment + 0.04
     }
-
-     let x = map(i, 0, lineHistory.length, 1190, map(counter, 0, ending, 1190, 90));
+     let x = map(i, 0, lineHistory.length, 1190, map(counter, 0, ending, 1190, 240));
      let y =(height/2)+50-map(lineHistory[i], 0, 100, 0, LVisMax);
 
      push();
@@ -147,7 +160,6 @@ pop();
      pop();
     
     vertex (x, y);
-     
   }
     endShape();
     
@@ -156,10 +168,10 @@ pop();
    stroke (255,200)
    drawingContext.setLineDash([0]);
     beginShape(); //Line connecting rect() to trail
-    curveVertex (map(counter, 0, ending, 1190, 100)-120 + (100*sin(counter)), (height/2)+50 + (150*sin(counter*5))+42)
-    curveVertex (map(counter, 0, ending, 1190, 100)-80, (height/2)+112)
-    curveVertex (map(counter, 0, ending, 1190, 90), (height/2)+50-map(lineVisual, 0, 100, 0, LVisMax))
-    curveVertex (map(counter, 0, ending, 1190, 90), (height/2)+50-map(lineVisual, 0, 100, 0, LVisMax))
+    curveVertex (map(counter, 0, ending, 1190, 250)-120 + (100*sin(counter)), (height/2)+50 + (150*sin(counter*5))+42)
+    curveVertex (map(counter, 0, ending, 1190, 250)-80, (height/2)+112)
+    curveVertex (map(counter, 0, ending, 1190, 240), (height/2)+50-map(lineVisual, 0, 100, 0, LVisMax))
+    curveVertex (map(counter, 0, ending, 1190, 240), (height/2)+50-map(lineVisual, 0, 100, 0, LVisMax))
     endShape();
     pop();
   pop();
@@ -168,19 +180,17 @@ pop();
   }
 
   push(); //BALLOON
-  balloon = new Balloon (map(counter, 0, ending, 1190, 90)-1, (height/2)+10-map(lineVisual, 0, 100, 0, LVisMax))
-  balloon.show(bass);
-  pop()
+balloon = new Balloon (map(counter, 0, ending, 1190, 240)-1, (height/2)+10-map(lineVisual, 0, 100, 0, LVisMax))
+balloon.show(bass);
+pop()
 
-
-  //CinematicBars + FilmStock + Refence text
+  //CinematicBars + FilmStock
  push();
  rectMode(CORNER);
  stroke(20)
  fill(20) 
   if (counter <720){ //For the fade in at the start
     cinemaBar = map (counter, 0, 720, 500, 70)
-
   } else {
     cinemaBar = 80
   }
@@ -192,7 +202,6 @@ pop();
  textStyle (NORMAL)
  textAlign(CENTER)
  rectMode(CENTER)
-
  textSize(120)
  fill (255)
   if (counter>200){
@@ -210,11 +219,12 @@ pop();
  pop();
 
  push(); //white squares
+ translate (random(15,18)*sin(counter),0)
  strokeJoin(ROUND)
- strokeWeight (random(4, 8))
+ strokeWeight (4)
  if (counter > 720){
-  stroke (100 + random (-10, 10), 255)
- fill(100 + random (-10, 10), 255)
+  stroke (100, 150)
+ fill(100, random(80,160))
  }
  for (x=12 ; x < width; x += 300 ){
   for (y = 15; y < height; y+= 647){ 
@@ -225,45 +235,27 @@ pop();
 
  if(counter >720){ //framecounter visual
  push();
+ translate (random(15,18)*sin(counter),0)
  rectMode(CENTER)
  textAlign(CENTER)
  fill (255,random(10, 25))
  textStyle(BOLD)
  textSize (60);
+ frameDiff = 10
  for (x=1080; x > 0; x-= 300){
   for (y=40; y<720; y += 645){
-  stockCount.push(int(counter/10)) //so that the frame count isn't absurdly high
+  stockCount.push(int(counter/5)) //so that the frame count isn't absurdly high
  if (stockCount.length > 4){
   stockCount.splice (0,1)
  }
- text (stockCount[0], x + random(2, 7), y + random(2, 4))
+ text (stockCount[0]-frameDiff, x + random(2, 7), y + random(2, 4))
   }
+  frameDiff += 3
  }
  pop();
 }
 
-  if (counter>11780){
-    background (0)
-    image (finalImg, 0, 85, 1280, 550)
-    fill(255)
-    rectMode(CENTER)
-    textAlign(CENTER)
-    text ("DSDN142: Music Visualiser by Justin.C", width/2,700)
-  }
-
-// push(); //REFERENCES FOR PLACEMENTS AND TIMING
-//   rectMode(CORNER)
-//   textAlign(LEFT)
-//  fill (255,0,0) 
-//  text ("1280x720", 10, 30)
-//  text (counter, 10, 60)
-//  translate(0,0)
-//  text (mouseX, 10, 90)
-//  text (mouseY, 10, 120)
-//   pop();
-  
 }  //end of DRAW FUNCTION
-
 
 //RAIN 
 class Rain {
@@ -296,7 +288,7 @@ class Grains {
   show (){
     drawingContext.setLineDash ([3]) //so that it doesn't look like perfect straight lines
     strokeWeight (random(1, 5))
-    stroke (150, random (20, 60))
+    stroke (150, random (40, 80))
     line (this.x, this.y, this.x, this.y + this.length)
     if (grains.length > 3){
       grains.splice (0,1);
