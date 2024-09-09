@@ -193,6 +193,9 @@ pop()
     cinemaBar = map (counter, 0, 720, 500, 70)
   } else {
     cinemaBar = 80
+    if(counter > 11740){
+      cinemaBar = 500
+    }
   }
  rect (0,-10, 1280, cinemaBar+random(5, 10)) //the actual cinema bars
  rect (0,720-cinemaBar+random(5, 10), 1280, cinemaBar)
@@ -204,7 +207,7 @@ pop()
  rectMode(CENTER)
  textSize(120)
  fill (255)
-  if (counter>200){
+  if (counter>200 && counter<11740){
     fill(255, map(counter, 200, 450, 255, 0))
  text ("V   I   O   L   E   T", width/2, (height/2) -40 - (map(counter, 200, 720, 0, 360)))
     textSize(40);
@@ -305,7 +308,7 @@ class Balloon {
   show(bass){
     stroke(230,255);
     strokeWeight(1)
-    fill (255,150,121)
+    fill (181,156,122)
 
  beginShape();
  push();
@@ -320,9 +323,9 @@ class Balloon {
  push();
  translate (this.x+5, this.y-7)
  rotate (0)
- rotate (map(bass, 0, 100, 5, 15))
+ rotate (map(bass, 0, 100, 10, 20))
   ellipse(random (0, 2), 0,65,75)
-  fill(255)
+  fill(255,180)
   rotate(30)
   ellipse(-23,-12,5,20)
  pop();
