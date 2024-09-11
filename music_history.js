@@ -7,9 +7,9 @@ let other_history = [];
 function draw_history_line(history) {
   beginShape(LINES);
   for(let i=0; i<history.length; i++) {
-    let x = i*4;
+    let x = i*8;
     let y = map(history[i], 0, 100, height, height/8, true);
-    vertex(x, y);
+    curveVertex(x, y);
   }
   endShape();
 }
@@ -32,8 +32,8 @@ function draw_history_words(history) {
 }
 
 function add_to_history(history, d) {
-  history.push(d);
-  if(history.length >= (width-1)/4) {
+  history.push(d);   
+  if(history.length >= (width-1)/8) { 
     history.shift();
   }
 }
