@@ -51,7 +51,7 @@ function draw_one_frame(words, vocal, drum, bass, other, counter) {
   push();
   imageMode(CORNER);
   colorMode (HSB);
-  tint (0,0,(map(other, 0, 100, 40, 100)))
+  tint (0,0,(map(other, 20, 100, 40, 100)))
   bgFrame = int(counter / 75) % 2
   image(bg[bgFrame], 0, 0);
   pop();
@@ -83,7 +83,7 @@ push(); //background singing char.
 imageMode(CENTER)
 colorMode (HSB)
 blendMode (SCREEN)
-tint (map(counter, 0, ending, 60, 20))
+tint (map(counter, 0, ending, 120, 60))
 translate (map(counter, 0, ending, 0, 640), 10*sin(counter))
 image (bgCharacter, 320,370)
 
@@ -222,7 +222,7 @@ pop()
  pop();
 
  push(); //white squares
- translate (random(15,18)*sin(counter),0)
+ translate (30*sin(counter),0)
  strokeJoin(ROUND)
  strokeWeight (4)
  if (counter > 720){
@@ -231,6 +231,9 @@ pop()
  }
  for (x=12 ; x < width; x += 300 ){
   for (y = 15; y < height; y+= 647){ 
+    push();
+    translate (50*cos(counter),0)
+    pop();
  rect (x + random(2, 7), y + random(-2, -5), 45, 50)
     }
    }
@@ -238,7 +241,7 @@ pop()
 
  if(counter >720){ //framecounter visual
  push();
- translate (random(15,18)*sin(counter),0)
+ translate (30*sin(counter),0)
  rectMode(CENTER)
  textAlign(CENTER)
  fill (255,random(10, 25))
@@ -247,6 +250,9 @@ pop()
  frameDiff = 10
  for (x=1080; x > 0; x-= 300){
   for (y=40; y<720; y += 645){
+    push();
+    translate (50*cos(counter+1000),0)
+    pop();
   stockCount.push(int(counter/5)) //so that the frame count isn't absurdly high
  if (stockCount.length > 4){
   stockCount.splice (0,1)
@@ -269,12 +275,16 @@ class Rain {
   }
   show (bass){
     strokeWeight (random(1, map(bass, 0, 100, 5, 9)))
+    if (bass > 60) {
+      stroke (181,156,122)
+    }else{
     stroke (255, random (40, 130))
+  }
     line (this.x, this.y, this.x, this.y + this.length)
   }
   fall(bass){
-    this.y += map(bass, 0, 100, 4, 12)
-    this.x += rainTilt + map (bass, 0, 100, 0, 2)
+    this.y += map(bass, 0, 100, 4, 15)
+    this.x += rainTilt + map (bass, 0, 100, 0, 2.5)
     if  (raining.length> map(bass, 0, 100, 247, 297)){ //mapping this allows for more rain depending on the bass
       raining.splice(0,1);
     }
